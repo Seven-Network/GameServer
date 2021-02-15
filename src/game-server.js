@@ -65,6 +65,7 @@ class Player {
     this.sendMode();
     this.sendLobbyPlayersInfo();
     this.gameServer.broadcastPlayerDetails(this.id);
+    this.gameServer.broadcastBoard();
   }
 
   handleChatMessage(data) {
@@ -188,6 +189,24 @@ class GameServer {
     }
   }
 
+  constructBoard() {
+    const data = [];
+    for (var i = 0; i < this.players.length; i++) {
+      this.data.push({
+        bar: 0.0,
+        kill: 0,
+        death: 0,
+        score: 0,
+        tier: 1,
+        playerId: this.players[i].id,
+        username: this.players[i].playerName,
+        skin: this.players[i].character,
+        verified: false,
+      });
+    }
+    return data;
+  }
+
   broadcast(data) {
     for (var i = 0; i < this.players.length; i++) {
       this.players[i].sendData(data);
@@ -198,6 +217,10 @@ class GameServer {
     for (var i = 0; i < this.players.length; i++) {
       this.players[i].sendPlayerInfo(id);
     }
+  }
+
+  broadcastBoard() {
+    this.broadcast(["board", this.constructBoard()]);
   }
 }
 
