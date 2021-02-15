@@ -35,7 +35,7 @@ class Player {
   }
 
   sendData(data) {
-    const encodedData = MessagePack.encode(new Uint8Array(data));
+    const encodedData = MessagePack.encode(data);
     this.ws.send(encodedData);
   }
 
@@ -121,6 +121,10 @@ class GameServer {
     this.gameMode = "POINT";
 
     this.lastAssignedID = 0;
+
+    this.wss.on("connection", (ws) => {
+      this.addPlayer(ws);
+    });
   }
 
   addPlayer(ws) {
