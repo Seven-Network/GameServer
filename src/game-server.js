@@ -35,7 +35,7 @@ class Player {
   }
 
   sendData(data) {
-    const encodedData = MessagePack.encode(data);
+    const encodedData = MessagePack.encode(new Uint8Array(data));
     this.ws.send(encodedData);
   }
 
