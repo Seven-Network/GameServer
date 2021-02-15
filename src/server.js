@@ -28,11 +28,20 @@ function createGameServer(id) {
   return newGameServer;
 }
 
+function getGameServer(id) {
+  for (var i = 0; i < gameServers.length; i++) {
+    if (gameServers[i].roomID == id) {
+      return gameServers[i];
+    }
+  }
+  return null;
+}
+
 server.on("upgrade", function upgrade(request, socket, head) {
   const pathname = url.parse(request.url).pathname;
 
   for (var i = 0; i < gameServers.length; i++) {
-    if (pathname == `/${gameServers[i].id}`) {
+    if (pathname == `?${gameServers[i].id}`) {
       gameServers[i].wss.handleUpgrade(
         request,
         socket,
@@ -53,3 +62,4 @@ server.listen(process.env.PORT || 7779, () => {
 });
 
 global.createGameServer = createGameServer;
+global.getGameServer = getGameServer;
