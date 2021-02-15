@@ -38,10 +38,10 @@ function getGameServer(id) {
 }
 
 server.on("upgrade", function upgrade(request, socket, head) {
-  const pathname = url.parse(request.url).pathname;
+  const pathname = request.url;
 
   for (var i = 0; i < gameServers.length; i++) {
-    if (pathname == `?${gameServers[i].id}`) {
+    if (pathname.includes(`?${gameServers[i].id}`)) {
       gameServers[i].wss.handleUpgrade(
         request,
         socket,
