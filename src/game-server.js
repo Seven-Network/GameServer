@@ -63,6 +63,8 @@ class Player {
 
     this.sendMe();
     this.sendMode();
+    this.sendLobbyPlayersInfo();
+    this.gameServer.broadcastPlayerDetails(this.id);
   }
 
   handleChatMessage(data) {
@@ -99,6 +101,36 @@ class Player {
       this.gameServer.map,
       false,
     ]);
+  }
+
+  sendPlayerInfo(id) {
+    for (var i = 0; i < this.gameServer.players.length; i++) {
+      if (this.gameServer.players[i].id == id) {
+        const player = this.gameServer.players[i];
+        this.sendData([
+          "player",
+          {
+            dance: "Techno",
+            group: 1,
+            herokSkin: false,
+            playerId: player.id,
+            skin: player.character,
+            team: "none",
+            username: player.playerName,
+            weapon: player.weapon,
+          },
+        ]);
+      }
+    }
+  }
+
+  sendLobbyPlayersInfo() {
+    for (var i = 0; i < this.gameServer.players.length; i++) {
+      if (this.gameServer.players[i].id == this.id) {
+        return;
+      }
+      this.sendPlayerInfo(this.gameServer.players[i].id);
+    }
   }
 
   sendRespawnInfo() {
@@ -159,6 +191,12 @@ class GameServer {
   broadcast(data) {
     for (var i = 0; i < this.players.length; i++) {
       this.players[i].sendData(data);
+    }
+  }
+
+  broadcastPlayerDetails(id) {
+    for (var i = 0; i < this.players.length; i++) {
+      this.players[i].sendPlayerInfo(id);
     }
   }
 }
