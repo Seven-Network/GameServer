@@ -192,7 +192,7 @@ class GameServer {
   constructBoard() {
     const data = [];
     for (var i = 0; i < this.players.length; i++) {
-      this.data.push({
+      data.push({
         bar: 0.0,
         kill: 0,
         death: 0,
