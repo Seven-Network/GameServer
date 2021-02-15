@@ -32,8 +32,6 @@ class Player {
     this.ws.on("close", () => {
       this.gameServer.removePlayer(this.id);
     });
-
-    this.sendData(["auth", true]);
   }
 
   sendData(data) {
@@ -129,6 +127,7 @@ class GameServer {
     this.lastAssignedID += 1;
     const newPlayer = new Player(this.lastAssignedID, ws, this);
     this.players.push(newPlayer);
+    newPlayer.sendData(["auth", true]);
   }
 
   removePlayer(id) {
