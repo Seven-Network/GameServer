@@ -24,7 +24,7 @@ class Player {
       },
 
       chat: (data) => {
-        this.handleChatMessage();
+        this.handleChatMessage(data);
       },
     };
 
