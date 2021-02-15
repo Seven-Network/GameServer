@@ -6,7 +6,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 
 const { GameServer } = require("./game-server");
-const serverLinkRouter = require("./server-link.router");
+const serverLinkRouter = require("./router");
 
 const app = express();
 
