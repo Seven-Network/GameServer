@@ -18,6 +18,10 @@ class Player {
       auth: (data) => {
         this.authenticate(data);
       },
+
+      respawn: (_) => {
+        this.sendRespawnInfo();
+      },
     };
 
     this.ws.on("message", (raw) => {
