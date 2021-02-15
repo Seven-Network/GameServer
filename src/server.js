@@ -1,6 +1,7 @@
 require("dotenv").config();
 
 const http = require("http");
+const url = require("url");
 const express = require("express");
 const bodyParser = require("body-parser");
 
@@ -30,17 +31,21 @@ function createGameServer(id) {
 server.on("upgrade", function upgrade(request, socket, head) {
   const pathname = url.parse(request.url).pathname;
 
-  if (pathname === "/foo") {
-    wss1.handleUpgrade(request, socket, head, function done(ws) {
-      wss1.emit("connection", ws, request);
-    });
-  } else if (pathname === "/bar") {
-    wss2.handleUpgrade(request, socket, head, function done(ws) {
-      wss2.emit("connection", ws, request);
-    });
-  } else {
-    socket.destroy();
+  for (var i = 0; i < gameServers.length; i++) {
+    if (pathname == `/${gameServers[i].id}`) {
+      gameServers[i].wss.handleUpgrade(
+        request,
+        socket,
+        head,
+        function done(ws) {
+          gameServers[i].wss.emit("connection", ws, request);
+        }
+      );
+      return;
+    }
   }
+
+  socket.destroy();
 });
 
 server.listen(process.env.PORT || 7779, () => {
