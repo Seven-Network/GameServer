@@ -21,12 +21,14 @@ class Player {
     };
 
     this.ws.on("message", (raw) => {
-      const data = MessagePack.decode(raw);
-      for (let [key, value] of Object.entries(this.messageHandlers)) {
-        if (data[0] == key) {
-          value(data);
+      try {
+        const data = MessagePack.decode(raw);
+        for (let [key, value] of Object.entries(this.messageHandlers)) {
+          if (data[0] == key) {
+            value(data);
+          }
         }
-      }
+      } catch (_) {}
     });
 
     this.ws.on("close", () => {
