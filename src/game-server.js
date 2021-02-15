@@ -22,6 +22,10 @@ class Player {
       respawn: (_) => {
         this.sendRespawnInfo();
       },
+
+      chat: (data) => {
+        this.handleChatMessage();
+      },
     };
 
     this.ws.on("message", (raw) => {
@@ -59,6 +63,10 @@ class Player {
 
     this.sendMe();
     this.sendMode();
+  }
+
+  handleChatMessage(data) {
+    this.gameServer.broadcast(["chat", this.id, data[1]]);
   }
 
   // 'Me' means the details of the player's self
@@ -145,6 +153,12 @@ class GameServer {
       if (this.players[i].id == id) {
         this.players.splice(i, 1);
       }
+    }
+  }
+
+  broadcast(data) {
+    for (var i = 0; i < this.players.length; i++) {
+      this.players[i].sendData(data);
     }
   }
 }
