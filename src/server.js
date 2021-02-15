@@ -41,7 +41,7 @@ server.on("upgrade", function upgrade(request, socket, head) {
   const pathname = request.url;
 
   for (var i = 0; i < gameServers.length; i++) {
-    if (pathname.includes(`?${gameServers[i].id}`)) {
+    if (pathname.includes(`?${gameServers[i].roomID}`)) {
       gameServers[i].wss.handleUpgrade(
         request,
         socket,
