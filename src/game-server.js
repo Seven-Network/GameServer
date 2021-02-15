@@ -32,6 +32,8 @@ class Player {
     this.ws.on("close", () => {
       this.gameServer.removePlayer(this.id);
     });
+
+    this.sendData(["auth", true]);
   }
 
   sendData(data) {
