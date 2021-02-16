@@ -169,7 +169,7 @@ class Player {
 
   sendRespawnInfo() {
     if (Date.now() >= this.lastRespawnTime + 5000) {
-      this.sendData([
+      this.gameServer.broadcast([
         "respawn",
         this.id,
         {
