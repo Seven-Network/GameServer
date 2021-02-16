@@ -105,7 +105,7 @@ class Player {
 
   takeDamage(amount) {
     this.health -= amount;
-    this.gameServer.broadcast[("h", this.id, this.health)];
+    this.gameServer.broadcast(["h", this.id, this.health]);
   }
 
   handlePositionUpdate(data) {
