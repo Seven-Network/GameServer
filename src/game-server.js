@@ -1,6 +1,15 @@
 const WebSocket = require("ws");
 const MessagePack = require("messagepack");
 
+const Utils = {
+  encodeFloat: function (e) {
+    return 5 * parseFloat(parseFloat(e).toFixed(1));
+  },
+  decodeFloat: function (e) {
+    return e / 5;
+  },
+};
+
 class Player {
   constructor(id, ws, gameServer) {
     this.id = id;
@@ -11,6 +20,12 @@ class Player {
     this.character = "";
     this.weapon = "";
     this.isAuthenticated = false;
+
+    this.position = {
+      x: 0,
+      y: 0,
+      z: 0,
+    };
 
     this.lastRespawnTime = Date.now() - 6000;
 
@@ -25,6 +40,24 @@ class Player {
 
       chat: (data) => {
         this.handleChatMessage(data);
+      },
+
+      p: (data) => {
+        const cachePosition = this.position;
+        this.position.x = Utils.decodeFloat(data[1]);
+        this.position.y = Utils.decodeFloat(data[2]);
+        this.position.z = Utils.decodeFloat(data[3]);
+        if (this.position != cachePosition) {
+          this.gameServer.broadcast([
+            "p",
+            this.id,
+            Utils.encodeFloat(this.position.x),
+            Utils.encodeFloat(this.position.y),
+            Utils.encodeFloat(this.position.z),
+            0,
+            0,
+          ]);
+        }
       },
     };
 
