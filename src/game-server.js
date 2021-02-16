@@ -112,7 +112,7 @@ class Player {
   handleStateUpdate(data) {
     if (data[1] == "f") {
       this.fState = data[2];
-      this.gameServer.broadcast("s", this.id, "f", this.fState);
+      this.gameServer.broadcastExcept(this.id, "s", this.id, "f", this.fState);
     }
   }
 
