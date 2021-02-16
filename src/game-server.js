@@ -32,6 +32,8 @@ class Player {
       b: 0,
     };
 
+    this.fState = false; // Shooting state
+
     this.lastRespawnTime = Date.now() - 6000;
 
     this.messageHandlers = {
@@ -65,6 +67,13 @@ class Player {
             Utils.encodeFloat(this.rotation.a),
             Utils.encodeFloat(this.rotation.b),
           ]);
+        }
+      },
+
+      s: (data) => {
+        if (data[1] == "f") {
+          this.fState = data[2];
+          this.gameServer.broadcast(["s", this.id, "f", this.fState]);
         }
       },
     };
