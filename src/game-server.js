@@ -39,38 +39,18 @@ class Player {
     this.lastRespawnTime = Date.now() - 6000;
 
     this.messageHandlers = {
-      auth: (data) => {
-        this.authenticate(data);
-      },
-      p: (data) => {
-        this.handlePositionUpdate(data);
-      },
-
-      s: (data) => {
-        this.handleStateUpdate(data);
-      },
-
-      da: (data) => {
-        this.handleDamageUpdate(data);
-      },
-
-      respawn: (_) => {
-        this.sendRespawnInfo();
-      },
-
-      chat: (data) => {
-        this.handleChatMessage(data);
-      },
+      auth: "authenticate",
+      p: "handlePositionUpdate",
+      s: "handleStateUpdate",
+      da: "handleDamageUpdate",
+      respawn: "sendRespawnInfo",
+      chat: "handleChatMessage"
     };
 
     this.ws.on("message", (raw) => {
       try {
         const data = MessagePack.decode(raw);
-        for (let [key, value] of Object.entries(this.messageHandlers)) {
-          if (data[0] == key) {
-            value(data);
-          }
-        }
+        if (data[0] in this.messageHandlers) this[this.messageHandlers[data[0]]](data)
       } catch (_) {}
     });
 
