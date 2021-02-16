@@ -21,6 +21,8 @@ class Player {
     this.weapon = "";
     this.isAuthenticated = false;
 
+    this.health = 100;
+
     this.position = {
       x: 0,
       y: 0,
@@ -40,6 +42,17 @@ class Player {
       auth: (data) => {
         this.authenticate(data);
       },
+      p: (data) => {
+        this.handlePositionUpdate(data);
+      },
+
+      s: (data) => {
+        this.handleStateUpdate(data);
+      },
+
+      da: (data) => {
+        this.handleDamageUpdate(data);
+      },
 
       respawn: (_) => {
         this.sendRespawnInfo();
@@ -47,34 +60,6 @@ class Player {
 
       chat: (data) => {
         this.handleChatMessage(data);
-      },
-
-      p: (data) => {
-        const cachePosition = Object.assign({}, this.position);
-        const cacheRotation = Object.assign({}, this.rotation);
-        this.position.x = Utils.decodeFloat(data[1]);
-        this.position.y = Utils.decodeFloat(data[2]);
-        this.position.z = Utils.decodeFloat(data[3]);
-        this.rotation.a = Utils.decodeFloat(data[4]);
-        this.rotation.b = Utils.decodeFloat(data[5]);
-        if (this.position != cachePosition || this.rotation != cacheRotation) {
-          this.gameServer.broadcast([
-            "p",
-            this.id,
-            Utils.encodeFloat(this.position.x),
-            Utils.encodeFloat(this.position.y),
-            Utils.encodeFloat(this.position.z),
-            Utils.encodeFloat(this.rotation.a),
-            Utils.encodeFloat(this.rotation.b),
-          ]);
-        }
-      },
-
-      s: (data) => {
-        if (data[1] == "f") {
-          this.fState = data[2];
-          this.gameServer.broadcast(["s", this.id, "f", this.fState]);
-        }
       },
     };
 
@@ -118,8 +103,70 @@ class Player {
     this.gameServer.broadcastBoard();
   }
 
+  takeDamage(amount) {
+    this.health -= amount;
+    this.gameServer.broadcast[("h", this.id, this.health)];
+  }
+
+  handlePositionUpdate(data) {
+    const cachePosition = Object.assign({}, this.position);
+    const cacheRotation = Object.assign({}, this.rotation);
+    this.position.x = Utils.decodeFloat(data[1]);
+    this.position.y = Utils.decodeFloat(data[2]);
+    this.position.z = Utils.decodeFloat(data[3]);
+    this.rotation.a = Utils.decodeFloat(data[4]);
+    this.rotation.b = Utils.decodeFloat(data[5]);
+    if (this.position != cachePosition || this.rotation != cacheRotation) {
+      this.gameServer.broadcast([
+        "p",
+        this.id,
+        Utils.encodeFloat(this.position.x),
+        Utils.encodeFloat(this.position.y),
+        Utils.encodeFloat(this.position.z),
+        Utils.encodeFloat(this.rotation.a),
+        Utils.encodeFloat(this.rotation.b),
+      ]);
+    }
+  }
+
+  handleStateUpdate(data) {
+    if (data[1] == "f") {
+      this.fState = data[2];
+      this.gameServer.broadcast(["s", this.id, "f", this.fState]);
+    }
+  }
+
+  handleDamageUpdate(data) {
+    const targetPlayer = this.gameServer.getPlayerByID(data[1]);
+    if (targetPlayer) {
+      targetPlayer.takeDamage(data[2]);
+    }
+  }
+
   handleChatMessage(data) {
     this.gameServer.broadcast(["chat", this.id, data[1]]);
+  }
+
+  sendRespawnInfo() {
+    if (Date.now() >= this.lastRespawnTime + 5000) {
+      this.gameServer.broadcast([
+        "respawn",
+        this.id,
+        {
+          position: {
+            x: 0,
+            y: 10,
+            z: 0,
+          },
+          rotation: {
+            x: 0,
+            y: 0,
+            z: 0,
+          },
+        },
+      ]);
+      this.lastRespawnTime = Date.now();
+    }
   }
 
   // 'Me' means the details of the player's self
@@ -183,28 +230,6 @@ class Player {
       this.sendPlayerInfo(this.gameServer.players[i].id);
     }
   }
-
-  sendRespawnInfo() {
-    if (Date.now() >= this.lastRespawnTime + 5000) {
-      this.gameServer.broadcast([
-        "respawn",
-        this.id,
-        {
-          position: {
-            x: 0,
-            y: 10,
-            z: 0,
-          },
-          rotation: {
-            x: 0,
-            y: 0,
-            z: 0,
-          },
-        },
-      ]);
-      this.lastRespawnTime = Date.now();
-    }
-  }
 }
 
 class GameServer {
@@ -235,6 +260,14 @@ class GameServer {
     for (var i = 0; i < this.players.length; i++) {
       if (this.players[i].id == id) {
         this.players.splice(i, 1);
+      }
+    }
+  }
+
+  getPlayerByID(id) {
+    for (var i = 0; i < this.players.length; i++) {
+      if (this.players[i].id == id) {
+        return this.players[i];
       }
     }
   }
