@@ -15,43 +15,33 @@ app.use("/", serverLinkRouter);
 
 const server = http.createServer(app);
 
-const gameServers = [];
+const gameServers = {};
 
 function createGameServer(id) {
-  for (var i = 0; i < gameServers.length; i++) {
-    if (gameServers[i].roomID == id) {
-      throw new Error("Game server with that ID already exists");
-    }
-  }
+  if (id in gameServers) throw new Error("Game server with that ID already exists");
   const newGameServer = new GameServer(id);
-  gameServers.push(newGameServer);
+  gameServers[id] = newGameServer;
   return newGameServer;
 }
 
 function getGameServer(id) {
-  for (var i = 0; i < gameServers.length; i++) {
-    if (gameServers[i].roomID == id) {
-      return gameServers[i];
-    }
-  }
-  return null;
+  return id in gameServers ? gameServers[id] : null
 }
 
 server.on("upgrade", function upgrade(request, socket, head) {
-  const pathname = request.url;
+  const pathname = request.url,
+        roomID = pathname.split('?').pop();
 
-  for (var i = 0; i < gameServers.length; i++) {
-    if (pathname.includes(`?${gameServers[i].roomID}`)) {
-      gameServers[i].wss.handleUpgrade(
+  if (roomID in gameServers) {
+    gameServers[roomID].wss.handleUpgrade(
         request,
         socket,
         head,
         function done(ws) {
-          gameServers[i].wss.emit("connection", ws, request);
+          gameServers[roomID].wss.emit("connection", ws, request);
         }
       );
       return;
-    }
   }
 
   socket.destroy();
