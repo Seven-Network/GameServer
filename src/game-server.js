@@ -79,7 +79,7 @@ class Player {
     });
   }
 
-  sendData(data) {
+  sendData(...data) {
     const encodedData = MessagePack.encode(data);
     this.ws.send(encodedData);
   }
@@ -105,7 +105,7 @@ class Player {
 
   takeDamage(amount) {
     this.health -= amount;
-    this.gameServer.broadcast(["h", this.id, this.health]);
+    this.gameServer.broadcast("h", this.id, this.health);
   }
 
   handlePositionUpdate(data) {
@@ -117,7 +117,7 @@ class Player {
     this.rotation.a = Utils.decodeFloat(data[4]);
     this.rotation.b = Utils.decodeFloat(data[5]);
     if (this.position != cachePosition || this.rotation != cacheRotation) {
-      this.gameServer.broadcast([
+      this.gameServer.broadcast(
         "p",
         this.id,
         Utils.encodeFloat(this.position.x),
@@ -125,14 +125,14 @@ class Player {
         Utils.encodeFloat(this.position.z),
         Utils.encodeFloat(this.rotation.a),
         Utils.encodeFloat(this.rotation.b),
-      ]);
+      );
     }
   }
 
   handleStateUpdate(data) {
     if (data[1] == "f") {
       this.fState = data[2];
-      this.gameServer.broadcast(["s", this.id, "f", this.fState]);
+      this.gameServer.broadcast("s", this.id, "f", this.fState);
     }
   }
 
@@ -144,12 +144,12 @@ class Player {
   }
 
   handleChatMessage(data) {
-    this.gameServer.broadcast(["chat", this.id, data[1]]);
+    this.gameServer.broadcast("chat", this.id, data[1]);
   }
 
   sendRespawnInfo() {
     if (Date.now() >= this.lastRespawnTime + 5000) {
-      this.gameServer.broadcast([
+      this.gameServer.broadcast(
         "respawn",
         this.id,
         {
@@ -164,14 +164,14 @@ class Player {
             z: 0,
           },
         },
-      ]);
+      );
       this.lastRespawnTime = Date.now();
     }
   }
 
   // 'Me' means the details of the player's self
   sendMe() {
-    this.sendData([
+    this.sendData(
       "me",
       {
         dance: "Techno",
@@ -189,23 +189,23 @@ class Player {
           "Tec-9": false,
         },
       },
-    ]);
+    );
   }
 
   sendMode() {
-    this.sendData([
+    this.sendData(
       "mode",
       this.gameServer.gameMode,
       this.gameServer.map,
       false,
-    ]);
+    );
   }
 
   sendPlayerInfo(id) {
     for (var i = 0; i < this.gameServer.players.length; i++) {
       if (this.gameServer.players[i].id == id) {
         const player = this.gameServer.players[i];
-        this.sendData([
+        this.sendData(
           "player",
           {
             dance: "Techno",
@@ -217,7 +217,7 @@ class Player {
             username: player.playerName,
             weapon: player.weapon,
           },
-        ]);
+        );
       }
     }
   }
@@ -253,7 +253,7 @@ class GameServer {
     this.lastAssignedID += 1;
     const newPlayer = new Player(this.lastAssignedID, ws, this);
     this.players.push(newPlayer);
-    newPlayer.sendData(["auth", true]);
+    newPlayer.sendData("auth", true);
   }
 
   removePlayer(id) {
@@ -290,9 +290,9 @@ class GameServer {
     return data;
   }
 
-  broadcast(data) {
+  broadcast(...data) {
     for (var i = 0; i < this.players.length; i++) {
-      this.players[i].sendData(data);
+      this.players[i].sendData(...data);
     }
   }
 
@@ -303,7 +303,7 @@ class GameServer {
   }
 
   broadcastBoard() {
-    this.broadcast(["board", this.constructBoard()]);
+    this.broadcast("board", this.constructBoard());
   }
 }
 
