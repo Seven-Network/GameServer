@@ -43,7 +43,7 @@ class Player {
       },
 
       p: (data) => {
-        const cachePosition = this.position;
+        const cachePosition = Object.assign({}, this.position);
         this.position.x = Utils.decodeFloat(data[1]);
         this.position.y = Utils.decodeFloat(data[2]);
         this.position.z = Utils.decodeFloat(data[3]);
