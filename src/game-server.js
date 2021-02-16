@@ -27,6 +27,11 @@ class Player {
       z: 0,
     };
 
+    this.rotation = {
+      a: 0,
+      b: 0,
+    };
+
     this.lastRespawnTime = Date.now() - 6000;
 
     this.messageHandlers = {
@@ -44,18 +49,21 @@ class Player {
 
       p: (data) => {
         const cachePosition = Object.assign({}, this.position);
+        const cacheRotation = Object.assign({}, this.rotation);
         this.position.x = Utils.decodeFloat(data[1]);
         this.position.y = Utils.decodeFloat(data[2]);
         this.position.z = Utils.decodeFloat(data[3]);
-        if (this.position != cachePosition) {
+        this.rotation.a = Utils.decodeFloat(data[4]);
+        this.rotation.b = Utils.decodeFloat(data[5]);
+        if (this.position != cachePosition || this.rotation != cacheRotation) {
           this.gameServer.broadcast([
             "p",
             this.id,
             Utils.encodeFloat(this.position.x),
             Utils.encodeFloat(this.position.y),
             Utils.encodeFloat(this.position.z),
-            0,
-            0,
+            Utils.encodeFloat(this.rotation.a),
+            Utils.encodeFloat(this.rotation.b),
           ]);
         }
       },
