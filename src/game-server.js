@@ -144,7 +144,7 @@ class Player {
   }
 
   handleChatMessage(data) {
-    this.gameServer.broadcast("chat", this.id, data[1]);
+    this.gameServer.broadcastExcept(this.id, "chat", this.id, data[1]);
   }
 
   sendRespawnInfo() {
@@ -293,6 +293,14 @@ class GameServer {
   broadcast(...data) {
     for (var i = 0; i < this.players.length; i++) {
       this.players[i].sendData(...data);
+    }
+  }
+
+  broadcastExcept(id, ...data) {
+    for (var i = 0; i < this.players.length; i++) {
+      if (this.players.id != id) {
+        this.players[i].sendData(...data);
+      }
     }
   }
 
