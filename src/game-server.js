@@ -284,6 +284,9 @@ class Player {
       weapon: false,
     });
     for (var i = 0; i < this.gameServer.players.length; i++) {
+      if (this.gameServer.players[i].id == this.id) {
+        return;
+      }
       this.sendPlayerInfo(this.gameServer.players[i].id);
     }
   }
