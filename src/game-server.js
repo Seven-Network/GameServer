@@ -47,6 +47,7 @@ class Player {
       p: "handlePositionUpdate",
       s: "handleStateUpdate",
       da: "handleDamageUpdate",
+      weapon: "handleWeaponUpdate",
       respawn: "sendRespawnInfo",
       chat: "handleChatMessage",
     };
@@ -158,6 +159,11 @@ class Player {
     if (targetPlayer) {
       targetPlayer.takeDamage(data[2], this.id);
     }
+  }
+
+  handleWeaponUpdate(data) {
+    this.weapon = data[1];
+    this.gameServer.broadcastExcept(this.id, "weapon", this.id, this.weapon);
   }
 
   handleChatMessage(data) {
