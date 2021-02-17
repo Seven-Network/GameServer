@@ -205,10 +205,10 @@ class Player {
   }
 
   handleChatMessage(data) {
-    this.gameServer.broadcastExcept(this.id, "chat", this.id, data[1]);
+    this.gameServer.broadcast("chat", this.id, data[1]);
   }
 
-  handlePingMessage(_) {
+  handlePingMessage(data) {
     this.sendData("ping", true);
   }
 
