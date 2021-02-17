@@ -302,7 +302,7 @@ class GameServer {
     this.players = [];
 
     this.map = "Xibalba";
-    this.gameMode = "POINT";
+    this.gameMode = "FFA";
 
     this.lastAssignedID = 0;
 
