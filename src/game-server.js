@@ -282,8 +282,35 @@ class GameServer {
 
     this.lastAssignedID = 0;
 
+    this.idleTime = 0;
+    this.lastIdleCheck = Date.now();
+
+    this.shouldTick = true;
+
     this.wss.on("connection", (ws) => {
       this.addPlayer(ws);
+    });
+
+    setImmediate(() => {
+      this.update();
+    });
+  }
+
+  update() {
+    if (!this.shouldTick) return;
+
+    // Check for server inactivity
+    if (this.players.length == 0) {
+      this.idleTime += Date.now() - this.lastIdleCheck;
+      if (this.idleTime >= 60000) {
+        global.destroyGameServer(this.roomID);
+      }
+    } else {
+      this.idleTime = 0;
+    }
+
+    setImmediate(() => {
+      this.update();
     });
   }
 
