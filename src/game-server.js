@@ -293,6 +293,7 @@ class GameServer {
   removePlayer(id) {
     for (var i = 0; i < this.players.length; i++) {
       if (this.players[i].id == id) {
+        this.broadcastExcept(id, "left", this.players[i].id);
         this.players.splice(i, 1);
       }
     }
