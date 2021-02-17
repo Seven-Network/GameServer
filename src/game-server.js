@@ -133,7 +133,7 @@ class Player {
     const killer = this.gameServer.getPlayerByID(killerID);
     if (killer) {
       killer.kills += 1;
-      killer.score += 10;
+      killer.score += score;
     }
 
     if (this.streakTimeout) clearTimeout(this.streakTimeout);
