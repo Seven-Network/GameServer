@@ -239,7 +239,7 @@ class Player {
       playerId: this.id,
       skin: this.character,
       team: "none",
-      username: this.username,
+      username: this.playerName,
       weapon: this.weapon,
       weaponSkins: {
         Scar: false,
