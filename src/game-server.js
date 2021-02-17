@@ -44,13 +44,14 @@ class Player {
       s: "handleStateUpdate",
       da: "handleDamageUpdate",
       respawn: "sendRespawnInfo",
-      chat: "handleChatMessage"
+      chat: "handleChatMessage",
     };
 
     this.ws.on("message", (raw) => {
       try {
         const data = MessagePack.decode(raw);
-        if (data[0] in this.messageHandlers) this[this.messageHandlers[data[0]]](data)
+        if (data[0] in this.messageHandlers)
+          this[this.messageHandlers[data[0]]](data);
       } catch (_) {}
     });
 
@@ -92,8 +93,15 @@ class Player {
   }
 
   die(killerID) {
-    this.gameServer.broadcast('d', this.id);
-    this.gameServer.broadcast('k', this.id, killerID);
+    this.gameServer.broadcast("d", this.id);
+    this.gameServer.broadcast("k", this.id, killerID);
+    this.gameServer.broadcast("announce", "kill", killerID, 10, "Kill");
+    this.gameServer.broadcast("notification", "kill", {
+      damage: 15,
+      killer: killerID,
+      killed: this.id,
+      reason: "yes",
+    });
   }
 
   handlePositionUpdate(data) {
@@ -112,7 +120,7 @@ class Player {
         Utils.encodeFloat(this.position.y),
         Utils.encodeFloat(this.position.z),
         Utils.encodeFloat(this.rotation.a),
-        Utils.encodeFloat(this.rotation.b),
+        Utils.encodeFloat(this.rotation.b)
       );
     }
   }
@@ -137,75 +145,60 @@ class Player {
 
   sendRespawnInfo() {
     if (Date.now() >= this.lastRespawnTime + 5000) {
-      this.gameServer.broadcast(
-        "respawn",
-        this.id,
-        {
-          position: {
-            x: 0,
-            y: 10,
-            z: 0,
-          },
-          rotation: {
-            x: 0,
-            y: 0,
-            z: 0,
-          },
+      this.gameServer.broadcast("respawn", this.id, {
+        position: {
+          x: 0,
+          y: 10,
+          z: 0,
         },
-      );
+        rotation: {
+          x: 0,
+          y: 0,
+          z: 0,
+        },
+      });
       this.lastRespawnTime = Date.now();
     }
   }
 
   // 'Me' means the details of the player's self
   sendMe() {
-    this.sendData(
-      "me",
-      {
-        dance: "Techno",
-        group: 1,
-        heroSkin: false,
-        playerId: this.id,
-        skin: this.character,
-        team: "none",
-        username: this.username,
-        weapon: this.weapon,
-        weaponSkins: {
-          Scar: false,
-          Shotgun: false,
-          Sniper: false,
-          "Tec-9": false,
-        },
+    this.sendData("me", {
+      dance: "Techno",
+      group: 1,
+      heroSkin: false,
+      playerId: this.id,
+      skin: this.character,
+      team: "none",
+      username: this.username,
+      weapon: this.weapon,
+      weaponSkins: {
+        Scar: false,
+        Shotgun: false,
+        Sniper: false,
+        "Tec-9": false,
       },
-    );
+    });
   }
 
   sendMode() {
-    this.sendData(
-      "mode",
-      this.gameServer.gameMode,
-      this.gameServer.map,
-      false,
-    );
+    this.sendData("mode", this.gameServer.gameMode, this.gameServer.map, false);
   }
 
   sendPlayerInfo(id) {
     for (var i = 0; i < this.gameServer.players.length; i++) {
       if (this.gameServer.players[i].id == id) {
         const player = this.gameServer.players[i];
-        this.sendData(
-          "player",
-          {
-            dance: "Techno",
-            group: 1,
-            herokSkin: false,
-            playerId: player.id,
-            skin: player.character,
-            team: "none",
-            username: player.playerName,
-            weapon: player.weapon,
-          },
-        );
+        this.sendData("player", {
+          dance: "Techno",
+          group: 1,
+          herokSkin: false,
+          playerId: player.id,
+          skin: player.character,
+          team: "none",
+          username: player.playerName,
+          weapon: player.weapon,
+        });
       }
     }
   }
