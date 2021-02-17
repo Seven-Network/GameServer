@@ -23,6 +23,10 @@ class Player {
 
     this.health = 100;
 
+    this.kills = 0;
+    this.deaths = 0;
+    this.score = 0;
+
     this.position = {
       x: 0,
       y: 0,
@@ -102,6 +106,16 @@ class Player {
       killed: this.id,
       reason: "yes",
     });
+
+    this.deaths += 1;
+
+    const killer = this.gameServer.getPlayerByID(killerID);
+    if (killer) {
+      killer.kills += 1;
+      killer.score += 10;
+    }
+
+    this.gameServer.broadcastBoard();
 
     // Respawn
     setTimeout(() => {
@@ -265,9 +279,9 @@ class GameServer {
     for (var i = 0; i < this.players.length; i++) {
       data.push({
         bar: 0.0,
-        kill: 0,
-        death: 0,
-        score: 0,
+        kill: this.players[i].kills,
+        death: this.players[i].deaths,
+        score: this.players[i].score,
         tier: 1,
         playerId: this.players[i].id,
         username: this.players[i].playerName,
