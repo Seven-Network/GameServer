@@ -357,6 +357,9 @@ class GameServer {
       this.timerInterval = setInterval(() => {
         if (this.timer < 1) return;
         this.timer -= 1;
+        if (this.timer == 0) {
+          this.endGame();
+        }
         this.broadcast("t", this.timer);
       }, 1000);
     }
@@ -378,6 +381,33 @@ class GameServer {
         return this.players[i];
       }
     }
+  }
+
+  endGame() {
+    const resultBoard = [];
+    for (var i = 0; i < this.players.length; i++) {
+      resultBoard.push({
+        id: this.players[i].id,
+        username: this.players[i].playerName,
+        team: "none",
+        won: 0,
+        kill: this.players[i].kills,
+        death: this.players[i].deaths,
+        score: this.players[i].score,
+        skin: this.players[i].character,
+      });
+    }
+    resultBoard.sort((a, b) => {
+      if (a.score > b.score) {
+        return -1;
+      } else if (a.score == b.score) {
+        return 0;
+      } else {
+        return 1;
+      }
+    });
+    resultBoard[0].won = 1;
+    this.broadcast("finish", resultBoard);
   }
 
   constructBoard() {
