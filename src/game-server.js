@@ -396,9 +396,12 @@ class GameServer {
         kill: this.players[i].kills,
         death: this.players[i].deaths,
         headshot: this.players[i].headshots,
+        bonuse: 0,
         score: this.players[i].score,
         skin: this.players[i].character,
         tier: 1,
+        experience: 0,
+        coins: 0,
       });
     }
     resultBoard.sort((a, b) => {
