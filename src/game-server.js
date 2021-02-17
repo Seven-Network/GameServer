@@ -68,7 +68,7 @@ class Player {
       weapon: "handleWeaponUpdate",
       respawn: "sendRespawnInfo",
       chat: "handleChatMessage",
-      ping: "handelePingMessage",
+      ping: "handlePingMessage",
     };
 
     this.ws.on("message", (raw) => {
