@@ -336,7 +336,7 @@ class GameServer {
         if (this.timer < 1) return;
         this.timer -= 1;
         this.broadcast("t", this.timer);
-      });
+      }, 1000);
     }
   }
 
