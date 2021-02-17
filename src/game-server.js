@@ -302,6 +302,7 @@ class GameServer {
     // Check for server inactivity
     if (this.players.length == 0) {
       this.idleTime += Date.now() - this.lastIdleCheck;
+      this.lastIdleCheck = Date.now();
       if (this.idleTime >= 60000) {
         global.destroyGameServer(this.roomID);
       }
