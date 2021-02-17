@@ -87,7 +87,7 @@ class Player {
   takeDamage(amount, damagerID) {
     this.health -= amount;
     this.gameServer.broadcast("h", this.id, this.health);
-    if (health <= 0) {
+    if (this.health <= 0) {
       this.die(damagerID);
     }
   }
