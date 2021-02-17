@@ -306,7 +306,7 @@ class GameServer {
 
     this.lastAssignedID = 0;
 
-    this.timer = 20;
+    this.timer = 300;
 
     this.idleTime = 0;
     this.lastIdleCheck = Date.now();
