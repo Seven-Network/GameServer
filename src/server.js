@@ -22,6 +22,7 @@ function createGameServer(id) {
     throw new Error("Game server with that ID already exists");
   const newGameServer = new GameServer(id);
   gameServers[id] = newGameServer;
+  console.log(`Created game ${newGameServer.roomID}`);
   return newGameServer;
 }
 
@@ -31,6 +32,7 @@ function getGameServer(id) {
 
 function destroyGameServer(id) {
   if (id in gameServers) {
+    console.log(`Destroyed game ${gameServers[id].roomID}`);
     gameServers[id].shouldTick = false;
     gameServers[id] = null;
   }
