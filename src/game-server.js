@@ -68,6 +68,7 @@ class Player {
       weapon: "handleWeaponUpdate",
       respawn: "sendRespawnInfo",
       chat: "handleChatMessage",
+      ping: "handelePingMessage",
     };
 
     this.ws.on("message", (raw) => {
@@ -105,6 +106,7 @@ class Player {
     this.sendLobbyPlayersInfo();
     this.gameServer.broadcastPlayerDetails(this.id);
     this.gameServer.broadcastBoard();
+    this.sendData("ping", true);
   }
 
   takeDamage(amount, damagerID, headshot) {
@@ -204,6 +206,10 @@ class Player {
 
   handleChatMessage(data) {
     this.gameServer.broadcastExcept(this.id, "chat", this.id, data[1]);
+  }
+
+  handlePingMessage(_) {
+    this.sendData("ping", true);
   }
 
   sendRespawnInfo() {
