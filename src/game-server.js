@@ -110,6 +110,7 @@ class Player {
   takeDamage(amount, damagerID, headshot) {
     if (!this.isAlive) return;
     this.health -= headshot ? amount * 2 : amount;
+    this.sendData("da", damagerID);
     this.gameServer.broadcast("h", this.id, this.health);
     if (this.health <= 0) {
       this.die(damagerID, amount, headshot);
@@ -123,12 +124,12 @@ class Player {
     const score = this.getStreakScore(this.streak);
     const notif = this.getStreakNotif(this.streak, headshot);
 
-    this.sendData("announce", "kill", killerID, score, notif);
     this.gameServer.broadcast("notification", "kill", {
       killer: killerID,
       killed: this.id,
       reason: false,
     });
+    this.sendData("announce", "kill", killerID, score, notif);
 
     this.isAlive = false;
     this.deaths += 1;
@@ -268,14 +269,13 @@ class Player {
   sendLobbyPlayersInfo() {
     // Not sure why but in game, there is player with ID -1
     this.sendData("player", {
-      dance: "Techno",
-      group: 1,
-      herokSkin: false,
+      dance: false,
+      group: -1,
+      skin: "none",
       playerId: "-1",
-      skin: "Lilum",
-      team: "none",
+      team: -1,
       username: "",
-      weapon: "",
+      weapon: false,
     });
     for (var i = 0; i < this.gameServer.players.length; i++) {
       if (this.gameServer.players[i].id == this.id) {
