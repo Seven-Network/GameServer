@@ -83,9 +83,17 @@ class Player {
     this.gameServer.broadcastBoard();
   }
 
-  takeDamage(amount) {
+  takeDamage(amount, damagerID) {
     this.health -= amount;
     this.gameServer.broadcast("h", this.id, this.health);
+    if (health <= 0) {
+      this.die(damagerID);
+    }
+  }
+
+  die(killerID) {
+    this.gameServer.broadcast(['d', this.id]);
+    this.gameServer.broadcast(['k', this.id, killerID]);
   }
 
   handlePositionUpdate(data) {
@@ -119,7 +127,7 @@ class Player {
   handleDamageUpdate(data) {
     const targetPlayer = this.gameServer.getPlayerByID(data[1]);
     if (targetPlayer) {
-      targetPlayer.takeDamage(data[2]);
+      targetPlayer.takeDamage(data[2], this.id);
     }
   }
 
