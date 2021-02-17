@@ -27,6 +27,22 @@ class Player {
     this.deaths = 0;
     this.score = 0;
 
+    this.streak = 1;
+    this.streakTimeout = null;
+    this.getStreakScore = (streak) => {
+      return [10, 15, 30, 35, 70, 125, 135, 155, 215, 265][
+        Math.min(streak, 10) - 1
+      ];
+    };
+    this.getStreakNotif = (streak, headshot) => {
+      if (streak == 1) {
+        return headshot ? "Headshot" : "Kill";
+      } else {
+        let s = Math.min(streak, 10);
+        return s + "x";
+      }
+    };
+
     this.position = {
       x: 0,
       y: 0,
@@ -93,16 +109,20 @@ class Player {
     this.health -= amount;
     this.gameServer.broadcast("h", this.id, this.health);
     if (this.health <= 0) {
-      this.die(damagerID);
+      this.die(damagerID, amount);
     }
   }
 
-  die(killerID) {
+  die(killerID, damage) {
     this.gameServer.broadcast("d", this.id);
     this.gameServer.broadcast("k", this.id, killerID);
-    this.gameServer.broadcast("announce", "kill", killerID, 10, "Kill");
+
+    const score = this.getStreakScore(this.streak);
+    const notif = this.getStreakNotif(this.streak, false);
+
+    this.gameServer.broadcast("announce", "kill", killerID, score, notif);
     this.gameServer.broadcast("notification", "kill", {
-      damage: 15,
+      damage: damage,
       killer: killerID,
       killed: this.id,
       reason: "yes",
@@ -115,6 +135,12 @@ class Player {
       killer.kills += 1;
       killer.score += 10;
     }
+
+    if (this.streakTimeout) clearTimeout(this.streakTimeout);
+    this.streak += 1;
+    this.streakTimeout = setTimeout(() => {
+      this.streak = 1;
+    }, 7000);
 
     this.gameServer.broadcastBoard();
 
