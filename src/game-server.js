@@ -92,8 +92,8 @@ class Player {
   }
 
   die(killerID) {
-    this.gameServer.broadcast(['d', this.id]);
-    this.gameServer.broadcast(['k', this.id, killerID]);
+    this.gameServer.broadcast('d', this.id);
+    this.gameServer.broadcast('k', this.id, killerID);
   }
 
   handlePositionUpdate(data) {
