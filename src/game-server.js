@@ -63,6 +63,7 @@ class Player {
       auth: "authenticate",
       p: "handlePositionUpdate",
       s: "handleStateUpdate",
+      e: "handleEventUpdate",
       da: "handleDamageUpdate",
       weapon: "handleWeaponUpdate",
       respawn: "sendRespawnInfo",
@@ -122,12 +123,11 @@ class Player {
     const score = this.getStreakScore(this.streak);
     const notif = this.getStreakNotif(this.streak, headshot);
 
-    this.gameServer.broadcast("announce", "kill", killerID, score, notif);
+    this.sendData("announce", "kill", killerID, score, notif);
     this.gameServer.broadcast("notification", "kill", {
-      damage: headshot ? damage * 2 : damage,
       killer: killerID,
       killed: this.id,
-      reason: "yes",
+      reason: false,
     });
 
     this.isAlive = false;
@@ -184,7 +184,12 @@ class Player {
     } catch (_) {}
   }
 
+  handleEventUpdate(data) {
+    this.gameServer.broadcastExcept(this.id, "e", this.id, data[1]);
+  }
+
   handleDamageUpdate(data) {
+    if (!this.isAlive) return;
     const targetPlayer = this.gameServer.getPlayerByID(data[1]);
     if (targetPlayer) {
       targetPlayer.takeDamage(data[2], this.id, data[3]);
