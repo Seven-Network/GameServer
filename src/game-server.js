@@ -282,11 +282,15 @@ class GameServer {
 
     this.lastAssignedID = 0;
 
+    this.timer = 300;
+
     this.idleTime = 0;
     this.lastIdleCheck = Date.now();
     this.isIdleChecking = false;
 
     this.shouldTick = true;
+
+    this.timerInterval = null;
 
     this.wss.on("connection", (ws) => {
       this.addPlayer(ws);
@@ -326,6 +330,14 @@ class GameServer {
     const newPlayer = new Player(this.lastAssignedID, ws, this);
     this.players.push(newPlayer);
     newPlayer.sendData("auth", true);
+    if (!this.timerInterval) {
+      // Set timer when first player joins
+      this.timerInterval = setInterval(() => {
+        if (this.timer < 1) return;
+        this.timer -= 1;
+        this.broadcast("t", this.timer);
+      });
+    }
   }
 
   removePlayer(id) {
