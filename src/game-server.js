@@ -266,6 +266,17 @@ class Player {
   }
 
   sendLobbyPlayersInfo() {
+    // Not sure why but in game, there is player with ID -1
+    this.sendData("player", {
+      dance: "Techno",
+      group: 1,
+      herokSkin: false,
+      playerId: "-1",
+      skin: "Lilum",
+      team: "none",
+      username: "",
+      weapon: "",
+    });
     for (var i = 0; i < this.gameServer.players.length; i++) {
       if (this.gameServer.players[i].id == this.id) {
         return;
