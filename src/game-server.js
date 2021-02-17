@@ -131,7 +131,7 @@ class Player {
       killed: this.id,
       reason: false,
     });
-    this.broadcast("announce", "kill", killerID, score, notif);
+    this.gameServer.broadcast("announce", "kill", killerID, score, notif);
 
     this.isAlive = false;
     this.deaths += 1;
