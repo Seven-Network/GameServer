@@ -22,6 +22,7 @@ class Player {
     this.isAuthenticated = false;
 
     this.health = 100;
+    this.isAlive = true;
 
     this.kills = 0;
     this.deaths = 0;
@@ -54,7 +55,7 @@ class Player {
       b: 0,
     };
 
-    this.fState = false; // Shooting state
+    this.states = {};
 
     this.lastRespawnTime = Date.now() - 6000;
 
@@ -106,6 +107,7 @@ class Player {
   }
 
   takeDamage(amount, damagerID, headshot) {
+    if (!this.isAlive) return;
     this.health -= headshot ? amount * 2 : amount;
     this.gameServer.broadcast("h", this.id, this.health);
     if (this.health <= 0) {
@@ -128,6 +130,7 @@ class Player {
       reason: "yes",
     });
 
+    this.isAlive = false;
     this.deaths += 1;
 
     const killer = this.gameServer.getPlayerByID(killerID);
@@ -140,12 +143,13 @@ class Player {
     this.streak += 1;
     this.streakTimeout = setTimeout(() => {
       this.streak = 1;
-    }, 7000);
+    }, 10000);
 
     this.gameServer.broadcastBoard();
 
     // Respawn
     setTimeout(() => {
+      this.isAlive = true;
       this.health = 100;
       this.gameServer.broadcast("h", this.id, this.health);
       this.sendRespawnInfo();
@@ -174,10 +178,10 @@ class Player {
   }
 
   handleStateUpdate(data) {
-    if (data[1] == "f") {
-      this.fState = data[2];
-      this.gameServer.broadcastExcept(this.id, "s", this.id, "f", this.fState);
-    }
+    try {
+      this.states[data[1]] = data[2];
+      this.gameServer.broadcastExcept(this.id, "s", this.id, data[1], data[2]);
+    } catch (_) {}
   }
 
   handleDamageUpdate(data) {
@@ -295,6 +299,7 @@ class GameServer {
       if (this.players[i].id == id) {
         this.broadcastExcept(id, "left", this.players[i].id);
         this.players.splice(i, 1);
+        this.broadcastBoard();
       }
     }
   }
