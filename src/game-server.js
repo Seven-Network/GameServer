@@ -234,7 +234,7 @@ class Player {
   sendMe() {
     this.sendData("me", {
       dance: "Techno",
-      group: 1,
+      group: this.id,
       heroSkin: false,
       playerId: this.id,
       skin: this.character,
@@ -260,8 +260,8 @@ class Player {
         const player = this.gameServer.players[i];
         this.sendData("player", {
           dance: "Techno",
-          group: 1,
-          herokSkin: false,
+          group: player.id,
+          heroSkin: false,
           playerId: player.id,
           skin: player.character,
           team: "none",
