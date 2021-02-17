@@ -415,7 +415,7 @@ class GameServer {
 
   broadcastExcept(id, ...data) {
     for (var i = 0; i < this.players.length; i++) {
-      if (this.players.id != id) {
+      if (this.players[i].id != id) {
         this.players[i].sendData(...data);
       }
     }
