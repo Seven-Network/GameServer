@@ -284,6 +284,7 @@ class GameServer {
 
     this.idleTime = 0;
     this.lastIdleCheck = Date.now();
+    this.isIdleChecking = false;
 
     this.shouldTick = true;
 
@@ -301,6 +302,10 @@ class GameServer {
 
     // Check for server inactivity
     if (this.players.length == 0) {
+      if (!this.isIdleChecking) {
+        this.lastIdleCheck = Date.now();
+        this.isIdleChecking = true;
+      }
       this.idleTime += Date.now() - this.lastIdleCheck;
       this.lastIdleCheck = Date.now();
       if (this.idleTime >= 60000) {
@@ -308,6 +313,7 @@ class GameServer {
       }
     } else {
       this.idleTime = 0;
+      this.isIdleChecking = false;
     }
 
     setImmediate(() => {
