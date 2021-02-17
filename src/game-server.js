@@ -105,24 +105,24 @@ class Player {
     this.gameServer.broadcastBoard();
   }
 
-  takeDamage(amount, damagerID) {
-    this.health -= amount;
+  takeDamage(amount, damagerID, headshot) {
+    this.health -= headshot ? amount * 2 : amount;
     this.gameServer.broadcast("h", this.id, this.health);
     if (this.health <= 0) {
-      this.die(damagerID, amount);
+      this.die(damagerID, amount, headshot);
     }
   }
 
-  die(killerID, damage) {
+  die(killerID, damage, headshot) {
     this.gameServer.broadcast("d", this.id);
     this.gameServer.broadcast("k", this.id, killerID);
 
     const score = this.getStreakScore(this.streak);
-    const notif = this.getStreakNotif(this.streak, false);
+    const notif = this.getStreakNotif(this.streak, headshot);
 
     this.gameServer.broadcast("announce", "kill", killerID, score, notif);
     this.gameServer.broadcast("notification", "kill", {
-      damage: damage,
+      damage: headshot ? damage * 2 : damage,
       killer: killerID,
       killed: this.id,
       reason: "yes",
@@ -183,7 +183,7 @@ class Player {
   handleDamageUpdate(data) {
     const targetPlayer = this.gameServer.getPlayerByID(data[1]);
     if (targetPlayer) {
-      targetPlayer.takeDamage(data[2], this.id);
+      targetPlayer.takeDamage(data[2], this.id, data[3]);
     }
   }
 
