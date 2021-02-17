@@ -26,6 +26,7 @@ class Player {
 
     this.kills = 0;
     this.deaths = 0;
+    this.headshots = 0;
     this.score = 0;
 
     this.streak = 1;
@@ -139,6 +140,7 @@ class Player {
     const killer = this.gameServer.getPlayerByID(killerID);
     if (killer) {
       killer.kills += 1;
+      killer.headshots += headshot ? 1 : 0;
       killer.score += score;
     }
 
@@ -304,7 +306,7 @@ class GameServer {
 
     this.lastAssignedID = 0;
 
-    this.timer = 300;
+    this.timer = 20;
 
     this.idleTime = 0;
     this.lastIdleCheck = Date.now();
@@ -393,8 +395,10 @@ class GameServer {
         won: 0,
         kill: this.players[i].kills,
         death: this.players[i].deaths,
+        headshot: this.players[i].headshots,
         score: this.players[i].score,
         skin: this.players[i].character,
+        tier: 1,
       });
     }
     resultBoard.sort((a, b) => {
