@@ -102,6 +102,13 @@ class Player {
       killed: this.id,
       reason: "yes",
     });
+
+    // Respawn
+    setTimeout(() => {
+      this.health = 100;
+      this.gameServer.broadcast("h", this.id, this.health);
+      this.sendRespawnInfo();
+    }, 4000);
   }
 
   handlePositionUpdate(data) {
