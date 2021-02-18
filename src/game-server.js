@@ -1,7 +1,7 @@
 const WebSocket = require("ws");
 const MessagePack = require("messagepack");
 
-const matchLength = 900;
+const matchLength = 15;
 const mapList = ["Sierra", "Xibalba", "Mistle", "Tundra", "Temple"];
 
 const Utils = {
