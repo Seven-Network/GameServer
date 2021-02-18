@@ -96,6 +96,7 @@ class Player {
   authenticate(data) {
     if (this.gameServer.isPrivateGame) {
       this.gameServer.map = data[5].map;
+      console.log(this.gameServer.map);
     }
     if (data[2] != "none") {
       this.playerName = data[2];
