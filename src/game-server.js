@@ -1,7 +1,7 @@
 const WebSocket = require("ws");
 const MessagePack = require("messagepack");
 
-const matchLength = 15;
+const matchLength = 300;
 const mapList = ["Sierra", "Xibalba", "Mistle", "Tundra", "Temple"];
 
 const Utils = {
@@ -409,6 +409,11 @@ class GameServer {
         coins: 0,
       });
     }
+    if (resultBoard.length < 1) {
+      this.shouldTick = false;
+      global.destroyGameServer(this.roomID);
+      return;
+    };
     resultBoard.sort((a, b) => {
       if (a.score > b.score) {
         return -1;
