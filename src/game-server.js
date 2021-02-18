@@ -301,12 +301,12 @@ class GameServer {
     this.roomID = roomID;
     this.players = [];
 
-    this.map = "Xibalba";
+    this.map = "Sierra";
     this.gameMode = "FFA";
 
     this.lastAssignedID = 0;
 
-    this.timer = 15;
+    this.timer = 300;
 
     this.idleTime = 0;
     this.lastIdleCheck = Date.now();
