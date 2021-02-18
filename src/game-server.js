@@ -1,6 +1,9 @@
 const WebSocket = require("ws");
 const MessagePack = require("messagepack");
 
+const matchLength = 15;
+const mapList = ["Sierra", "Xibalba", "Mistle", "Tundra", "Temple"];
+
 const Utils = {
   encodeFloat: function (e) {
     return 5 * parseFloat(parseFloat(e).toFixed(1));
@@ -306,7 +309,7 @@ class GameServer {
 
     this.lastAssignedID = 0;
 
-    this.timer = 300;
+    this.timer = matchLength;
 
     this.idleTime = 0;
     this.lastIdleCheck = Date.now();
@@ -417,6 +420,24 @@ class GameServer {
     });
     resultBoard[0].won = 1;
     this.broadcast("finish", resultBoard);
+    setTimeout(() => {
+      // Restart game
+      this.restartGame();
+    }, 20000);
+  }
+
+  restartGame() {
+    const randomMap = mapList[Math.floor(Math.random() * mapList.length)];
+    this.map = randomMap;
+    this.timer = matchLength;
+    for (var i = 0; i < this.players.length; i++) {
+      this.players[i].kills = 0;
+      this.players[i].deaths = 0;
+      this.players[i].headshots = 0;
+      this.players[i].score = 0;
+      this.players[i].sendMode();
+    }
+    this.broadcastBoard();
   }
 
   constructBoard() {
