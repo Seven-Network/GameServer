@@ -310,7 +310,7 @@ class GameServer {
     this.roomID = roomID;
     this.players = [];
 
-    //this.map = "Sierra";
+    this.map = "Prototype";
     this.gameMode = "FFA";
 
     this.lastAssignedID = 0;
