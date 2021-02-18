@@ -1,7 +1,7 @@
 const WebSocket = require("ws");
 const MessagePack = require("messagepack");
 
-const matchLength = 300;
+const matchLength = 900;
 const mapList = ["Sierra", "Xibalba", "Mistle", "Tundra", "Temple"];
 
 const Utils = {
@@ -94,6 +94,9 @@ class Player {
   }
 
   authenticate(data) {
+    if (this.gameServer.isPrivateGame) {
+      this.map = data[5].map;
+    }
     if (data[2] != "none") {
       this.playerName = data[2];
     } else {
@@ -300,6 +303,8 @@ class Player {
 class GameServer {
   constructor(roomID) {
     this.wss = new WebSocket.Server({ noServer: true });
+
+    this.isPrivateGame = true;
 
     this.roomID = roomID;
     this.players = [];
