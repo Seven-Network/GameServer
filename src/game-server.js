@@ -225,9 +225,9 @@ class Player {
     if (Date.now() >= this.lastRespawnTime + 5000) {
       this.gameServer.broadcast("respawn", this.id, {
         position: {
-          x: -3.897426128387451,
-          y: 21.815570831298828,
-          z: -224.93080139160156
+          x: 13.897426128387451,
+          y: 10.815570831298828,
+          z: -132.93080139160156
         },
         rotation: {
           x: 0,
