@@ -463,7 +463,7 @@ class GameServer {
         playerId: this.players[i].id,
         username: this.players[i].playerName,
         skin: this.players[i].character,
-        verified: true,
+        verified: false,
       });
     }
     data.sort((a, b) => {
