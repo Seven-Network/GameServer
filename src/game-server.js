@@ -1,6 +1,8 @@
 const WebSocket = require("ws");
 const MessagePack = require("messagepack");
 
+const spawns = require("./spawns.json");
+
 const matchLength = 300;
 const mapList = ["Sierra", "Xibalba", "Mistle", "Tundra", "Temple"];
 
@@ -223,16 +225,17 @@ class Player {
 
   sendRespawnInfo() {
     if (Date.now() >= this.lastRespawnTime + 5000) {
+      const spawn = this.gameServer.getSpawnPoint();
       this.gameServer.broadcast("respawn", this.id, {
         position: {
-          x: 13.897426128387451,
-          y: 10.815570831298828,
-          z: -132.93080139160156
+          x: spawn.position.x,
+          y: spawn.position.y,
+          z: spawn.position.z,
         },
         rotation: {
-          x: 0,
-          y: 89.00561208665917,
-          z: 0,
+          x: spawn.rotation.x,
+          y: spawn.rotation.y,
+          z: spawn.rotation.z,
         },
       });
       this.lastRespawnTime = Date.now();
@@ -317,6 +320,8 @@ class GameServer {
 
     this.timer = matchLength;
 
+    this.spawnIndex = 0;
+
     this.idleTime = 0;
     this.lastIdleCheck = Date.now();
     this.isIdleChecking = false;
@@ -392,6 +397,14 @@ class GameServer {
         return this.players[i];
       }
     }
+  }
+
+  getSpawnPoint() {
+    const mapSpawns = spawns[this.map];
+    const spawn = mapSpawns[this.spawnIndex];
+    this.spawnIndex += 1;
+    if (this.spawnIndex >= mapSpawns.length) this.spawnIndex = 0;
+    return spawn;
   }
 
   endGame() {
