@@ -439,8 +439,9 @@ class GameServer {
 
   restartGame() {
     // EZ FIX
+    var randomMap;
     while (true) {
-      const randomMap = mapList[Math.floor(Math.random() * mapList.length)];
+      randomMap = mapList[Math.floor(Math.random() * mapList.length)];
       if (randomMap != this.map) break;
     }
     this.map = randomMap;
