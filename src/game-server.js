@@ -385,7 +385,7 @@ class GameServer {
       this.idleTime += Date.now() - this.lastIdleCheck;
       this.lastIdleCheck = Date.now();
       if (this.idleTime >= 60000) {
-        global.destroyGameServer(this.roomID);
+        // global.destroyGameServer(this.roomID);
       }
     } else {
       this.idleTime = 0;
