@@ -73,6 +73,7 @@ class Player {
       s: "handleStateUpdate",
       e: "handleEventUpdate",
       da: "handleDamageUpdate",
+      throw: "handleThrowUpdate",
       weapon: "handleWeaponUpdate",
       respawn: "sendRespawnInfo",
       drown: "handleDrownUpdate",
@@ -233,6 +234,21 @@ class Player {
     }
   }
 
+  handleThrowUpdate(data) {
+    this.broadcastExcept(
+      this.id,
+      "throw",
+      this.id,
+      data[1],
+      data[2],
+      data[3],
+      data[4],
+      data[5],
+      data[6],
+      data[7]
+    );
+  }
+
   handleWeaponUpdate(data) {
     this.weapon = data[1];
     this.gameServer.broadcastExcept(this.id, "weapon", this.id, this.weapon);
@@ -371,7 +387,10 @@ class GameServer {
 
     // Update regen
     for (var i = 0; i < this.players.length; i++) {
-      if (this.players[i].health < 100 && this.players[i].lastDamageTime + 8000 <= Date.now()) {
+      if (
+        this.players[i].health < 100 &&
+        this.players[i].lastDamageTime + 8000 <= Date.now()
+      ) {
         this.players[i].setHealth(100);
       }
     }
