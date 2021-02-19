@@ -17,10 +17,11 @@ const server = http.createServer(app);
 
 const gameServers = {};
 
-function createGameServer(id) {
+function createGameServer(id, map) {
   if (id in gameServers)
     throw new Error("Game server with that ID already exists");
   const newGameServer = new GameServer(id);
+  newGameServer.map = map;
   gameServers[id] = newGameServer;
   console.log(`Created game ${newGameServer.roomID}`);
   return newGameServer;

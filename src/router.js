@@ -27,13 +27,13 @@ router.get("/get-game/:id/:serverLinkPass", (req, res) => {
   }
 });
 
-router.get("/create-game/:id/:serverLinkPass", (req, res) => {
+router.get("/create-game/:id/:map/:serverLinkPass", (req, res) => {
   if (req.params.serverLinkPass != process.env.SERVER_LINK_PASS) {
     res.status(403);
     res.send("Incorrect server link password");
   } else {
     try {
-      global.createGameServer(req.params.id);
+      global.createGameServer(req.params.id, req.params.map);
       res.send("Created game server");
     } catch (error) {
       res.status(500);
