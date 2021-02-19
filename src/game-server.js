@@ -73,6 +73,7 @@ class Player {
       da: "handleDamageUpdate",
       weapon: "handleWeaponUpdate",
       respawn: "sendRespawnInfo",
+      drown: "handleDrownUpdate",
       chat: "handleChatMessage",
       ping: "handlePingMessage",
     };
@@ -133,31 +134,45 @@ class Player {
     this.gameServer.broadcast("d", this.id);
     this.gameServer.broadcast("k", this.id, killerID);
 
-    const score = this.getStreakScore(this.streak);
-    const notif = this.getStreakNotif(this.streak, headshot);
+    var score;
+    var notif;
+
+    if (killerID != this.id) {
+      score = this.getStreakScore(this.streak);
+      notif = this.getStreakNotif(this.streak, headshot);
+    } else {
+      score = -10;
+      notif = "Suicide";
+    }
 
     this.gameServer.broadcast("notification", "kill", {
       killer: killerID,
       killed: this.id,
-      reason: false,
+      reason: killerID == this.id ? "Suicide" : false,
     });
     this.gameServer.broadcast("announce", "kill", killerID, score, notif);
 
     this.isAlive = false;
     this.deaths += 1;
 
-    const killer = this.gameServer.getPlayerByID(killerID);
-    if (killer) {
-      killer.kills += 1;
-      killer.headshots += headshot ? 1 : 0;
-      killer.score += score;
-    }
+    if (killerID != this.id) {
+      // Give stats and streak to killer
+      const killer = this.gameServer.getPlayerByID(killerID);
+      if (killer) {
+        killer.kills += 1;
+        killer.headshots += headshot ? 1 : 0;
+        killer.score += score;
+      }
 
-    if (this.streakTimeout) clearTimeout(this.streakTimeout);
-    this.streak += 1;
-    this.streakTimeout = setTimeout(() => {
-      this.streak = 1;
-    }, 10000);
+      if (this.streakTimeout) clearTimeout(this.streakTimeout);
+      this.streak += 1;
+      this.streakTimeout = setTimeout(() => {
+        this.streak = 1;
+      }, 10000);
+    } else {
+      // Otherwise add score penalty is suicide
+      this.score += score;
+    }
 
     this.gameServer.broadcastBoard();
 
@@ -240,6 +255,10 @@ class Player {
       });
       this.lastRespawnTime = Date.now();
     }
+  }
+
+  handleDrownUpdate() {
+    this.die(this.id, 100, false);
   }
 
   // 'Me' means the details of the player's self
@@ -432,7 +451,7 @@ class GameServer {
       this.shouldTick = false;
       global.destroyGameServer(this.roomID);
       return;
-    };
+    }
     resultBoard.sort((a, b) => {
       if (a.score > b.score) {
         return -1;
