@@ -1,7 +1,7 @@
 const router = require("express").Router();
 
 router.get("/", (_, res) => {
-  res.send("Welcome to the Seven Network invite server ✨");
+  res.send("Welcome to the Seven Network game server ✨");
 });
 
 router.post("/get-room/:roomID", (req, res) => {
