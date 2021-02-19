@@ -34,6 +34,8 @@ class Player {
     this.headshots = 0;
     this.score = 0;
 
+    this.lastDamageTime = Date.now();
+
     this.streak = 1;
     this.streakTimeout = null;
     this.getStreakScore = (streak) => {
@@ -120,6 +122,11 @@ class Player {
     this.sendData("ping", true);
   }
 
+  setHealth(newHealth) {
+    this.health = newHealth;
+    this.gameServer.broadcast("h", this.id, this.health);
+  }
+
   takeDamage(amount, damagerID, headshot) {
     if (!this.isAlive) return;
     this.health -= headshot ? amount * 2 : amount;
@@ -128,6 +135,7 @@ class Player {
     if (this.health <= 0) {
       this.die(damagerID, amount, headshot);
     }
+    this.lastDamageTime = Date.now();
   }
 
   die(killerID, damage, headshot) {
@@ -360,6 +368,13 @@ class GameServer {
 
   update() {
     if (!this.shouldTick) return;
+
+    // Update regen
+    for (var i = 0; i < this.players.length; i++) {
+      if (this.players[i].health < 100 && this.players[i].lastDamageTime + 8000 >= Date.now()) {
+        this.players[i].setHealth(100);
+      }
+    }
 
     // Check for server inactivity
     if (this.players.length == 0) {
