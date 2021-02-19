@@ -61,6 +61,7 @@ server.listen(process.env.PORT || 7779, () => {
   console.log(`Running on port ${process.env.PORT || 7779}`);
 });
 
+global.gameServers = gameServers;
 global.createGameServer = createGameServer;
 global.getGameServer = getGameServer;
 global.destroyGameServer = destroyGameServer;
