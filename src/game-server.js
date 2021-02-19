@@ -438,7 +438,11 @@ class GameServer {
   }
 
   restartGame() {
-    const randomMap = mapList[Math.floor(Math.random() * mapList.length)];
+    // EZ FIX
+    while (true) {
+      const randomMap = mapList[Math.floor(Math.random() * mapList.length)];
+      if (randomMap != this.map) break;
+    }
     this.map = randomMap;
     this.timer = matchLength;
     for (var i = 0; i < this.players.length; i++) {
