@@ -107,7 +107,9 @@ class Player {
     if (data[2] != "none") {
       this.playerName = data[2];
     } else {
-      this.playerName = `Guest ${this.id}`;
+      this.sendData("kick", "Authentication failure");
+      this.ws.close(1000);
+      return;
     }
     this.character = data[3];
     this.weapon = data[4];
