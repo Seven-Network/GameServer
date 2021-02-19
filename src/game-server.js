@@ -235,7 +235,7 @@ class Player {
   }
 
   handleThrowUpdate(data) {
-    this.broadcastExcept(
+    this.gameServer.broadcastExcept(
       this.id,
       "throw",
       data[1],
