@@ -1,7 +1,6 @@
 require("dotenv").config();
 
 const http = require("http");
-const url = require("url");
 const express = require("express");
 const bodyParser = require("body-parser");
 
