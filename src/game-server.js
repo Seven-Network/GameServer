@@ -371,7 +371,7 @@ class GameServer {
 
     // Update regen
     for (var i = 0; i < this.players.length; i++) {
-      if (this.players[i].health < 100 && this.players[i].lastDamageTime + 8000 >= Date.now()) {
+      if (this.players[i].health < 100 && this.players[i].lastDamageTime + 8000 <= Date.now()) {
         this.players[i].setHealth(100);
       }
     }
