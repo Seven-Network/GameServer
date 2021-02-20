@@ -1,10 +1,12 @@
 const WebSocket = require("ws");
+const axios = require("axios").default;
 const MessagePack = require("messagepack");
 
 const spawns = require("./spawns.json");
 
 const matchLength = 300;
 const mapList = ["Sierra", "Xibalba", "Mistle", "Tundra", "Temple"];
+const gatewayHost = process.env.GATEWAY_HOST;
 
 const Utils = {
   encodeFloat: function (e) {
@@ -100,29 +102,41 @@ class Player {
   }
 
   authenticate(data) {
-    if (this.gameServer.isPrivateGame) {
-      this.gameServer.map = data[5].map;
-      console.log(this.gameServer.map);
-    }
-    if (data[2] != "none") {
-      this.playerName = data[2];
-    } else {
-      this.sendData("kick", "Authentication failure");
-      this.ws.close(1000);
-      return;
-    }
-    this.character = data[3];
-    this.weapon = data[4];
-    this.isAuthenticated = true;
+    this.hash = data[6];
+    axios
+      .post(`http://${gatewayHost}/user/details?hash=${this.hash}`)
+      .then((response) => {
+        if (response.status != 200) {
+          this.sendData("kick", "Authentication failure");
+          this.ws.close(1000);
+          return;
+        } else {
+          if (this.gameServer.isPrivateGame) {
+            this.gameServer.map = data[5].map;
+            console.log(this.gameServer.map);
+          }
+          this.playerName = response.data.username;
+          this.character = data[3];
+          this.weapon = data[4];
+          this.isAuthenticated = true;
 
-    console.log(`${this.playerName} connected to ${this.gameServer.roomID}`);
+          console.log(
+            `${this.playerName} connected to ${this.gameServer.roomID}`
+          );
 
-    this.sendMe();
-    this.sendMode();
-    this.sendLobbyPlayersInfo();
-    this.gameServer.broadcastPlayerDetails(this.id);
-    this.gameServer.broadcastBoard();
-    this.sendData("ping", true);
+          this.sendMe();
+          this.sendMode();
+          this.sendLobbyPlayersInfo();
+          this.gameServer.broadcastPlayerDetails(this.id);
+          this.gameServer.broadcastBoard();
+          this.sendData("ping", true);
+        }
+      })
+      .catch(() => {
+        this.sendData("kick", "Authentication failure");
+        this.ws.close(1000);
+        return;
+      });
   }
 
   setHealth(newHealth) {
