@@ -26,6 +26,7 @@ class Player {
     this.playerName = '';
     this.character = '';
     this.weapon = '';
+    this.isVerified = false;
     this.isAuthenticated = false;
 
     this.health = 100;
@@ -118,6 +119,7 @@ class Player {
           this.playerName = response.data.username;
           this.character = data[3];
           this.weapon = data[4];
+          this.isVerified = response.data.verified == '1';
           this.isAuthenticated = true;
 
           console.log(
@@ -551,7 +553,7 @@ class GameServer {
         playerId: this.players[i].id,
         username: this.players[i].playerName,
         skin: this.players[i].character,
-        verified: false,
+        verified: this.players[i].isVerified,
       });
     }
     data.sort((a, b) => {
