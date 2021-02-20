@@ -17,8 +17,8 @@ phases:
       - echo Build completed on `date`
 cache:
   paths:
-    - "node_modules/**/*"
+    - 'node_modules/**/*'
 artifacts:
   files:
-    - "**/*"
+    - '**/*'
   name: sn-game-server-build-$(date +%Y-%m-%d)

@@ -1,11 +1,11 @@
-const WebSocket = require("ws");
-const axios = require("axios").default;
-const MessagePack = require("messagepack");
+const WebSocket = require('ws');
+const axios = require('axios').default;
+const MessagePack = require('messagepack');
 
-const spawns = require("./spawns.json");
+const spawns = require('./spawns.json');
 
 const matchLength = 300;
-const mapList = ["Sierra", "Xibalba", "Mistle", "Tundra", "Temple"];
+const mapList = ['Sierra', 'Xibalba', 'Mistle', 'Tundra', 'Temple'];
 const gatewayHost = process.env.GATEWAY_HOST;
 
 const Utils = {
@@ -23,9 +23,9 @@ class Player {
     this.ws = ws;
     this.gameServer = gameServer;
 
-    this.playerName = "";
-    this.character = "";
-    this.weapon = "";
+    this.playerName = '';
+    this.character = '';
+    this.weapon = '';
     this.isAuthenticated = false;
 
     this.health = 100;
@@ -47,10 +47,10 @@ class Player {
     };
     this.getStreakNotif = (streak, headshot) => {
       if (streak == 1) {
-        return headshot ? "Headshot" : "Kill";
+        return headshot ? 'Headshot' : 'Kill';
       } else {
         let s = Math.min(streak, 10);
-        return s + "x";
+        return s + 'x';
       }
     };
 
@@ -70,20 +70,20 @@ class Player {
     this.lastRespawnTime = Date.now() - 6000;
 
     this.messageHandlers = {
-      auth: "authenticate",
-      p: "handlePositionUpdate",
-      s: "handleStateUpdate",
-      e: "handleEventUpdate",
-      da: "handleDamageUpdate",
-      throw: "handleThrowUpdate",
-      weapon: "handleWeaponUpdate",
-      respawn: "sendRespawnInfo",
-      drown: "handleDrownUpdate",
-      chat: "handleChatMessage",
-      ping: "handlePingMessage",
+      auth: 'authenticate',
+      p: 'handlePositionUpdate',
+      s: 'handleStateUpdate',
+      e: 'handleEventUpdate',
+      da: 'handleDamageUpdate',
+      throw: 'handleThrowUpdate',
+      weapon: 'handleWeaponUpdate',
+      respawn: 'sendRespawnInfo',
+      drown: 'handleDrownUpdate',
+      chat: 'handleChatMessage',
+      ping: 'handlePingMessage',
     };
 
-    this.ws.on("message", (raw) => {
+    this.ws.on('message', (raw) => {
       try {
         const data = MessagePack.decode(raw);
         if (data[0] in this.messageHandlers)
@@ -91,7 +91,7 @@ class Player {
       } catch (_) {}
     });
 
-    this.ws.on("close", () => {
+    this.ws.on('close', () => {
       this.gameServer.removePlayer(this.id);
     });
   }
@@ -107,7 +107,7 @@ class Player {
       .post(`http://${gatewayHost}/user/details?hash=${this.hash}`)
       .then((response) => {
         if (response.status != 200) {
-          this.sendData("kick", "Authentication failure");
+          this.sendData('kick', 'Authentication failure');
           this.ws.close(1000);
           return;
         } else {
@@ -129,11 +129,11 @@ class Player {
           this.sendLobbyPlayersInfo();
           this.gameServer.broadcastPlayerDetails(this.id);
           this.gameServer.broadcastBoard();
-          this.sendData("ping", true);
+          this.sendData('ping', true);
         }
       })
       .catch(() => {
-        this.sendData("kick", "Authentication failure");
+        this.sendData('kick', 'Authentication failure');
         this.ws.close(1000);
         return;
       });
@@ -141,14 +141,14 @@ class Player {
 
   setHealth(newHealth) {
     this.health = newHealth;
-    this.gameServer.broadcast("h", this.id, this.health);
+    this.gameServer.broadcast('h', this.id, this.health);
   }
 
   takeDamage(amount, damagerID, headshot) {
     if (!this.isAlive) return;
     this.health -= headshot ? amount * 2 : amount;
-    this.sendData("da", damagerID);
-    this.gameServer.broadcast("h", this.id, this.health);
+    this.sendData('da', damagerID);
+    this.gameServer.broadcast('h', this.id, this.health);
     if (this.health <= 0) {
       this.die(damagerID, amount, headshot);
     }
@@ -156,8 +156,8 @@ class Player {
   }
 
   die(killerID, damage, headshot) {
-    this.gameServer.broadcast("d", this.id);
-    this.gameServer.broadcast("k", this.id, killerID);
+    this.gameServer.broadcast('d', this.id);
+    this.gameServer.broadcast('k', this.id, killerID);
 
     var score;
     var notif;
@@ -167,15 +167,15 @@ class Player {
       notif = this.getStreakNotif(this.streak, headshot);
     } else {
       score = -10;
-      notif = "Suicide";
+      notif = 'Suicide';
     }
 
-    this.gameServer.broadcast("notification", "kill", {
+    this.gameServer.broadcast('notification', 'kill', {
       killer: killerID,
       killed: this.id,
-      reason: killerID == this.id ? "Suicide" : false,
+      reason: killerID == this.id ? 'Suicide' : false,
     });
-    this.gameServer.broadcast("announce", "kill", killerID, score, notif);
+    this.gameServer.broadcast('announce', 'kill', killerID, score, notif);
 
     this.isAlive = false;
     this.deaths += 1;
@@ -205,7 +205,7 @@ class Player {
     setTimeout(() => {
       this.isAlive = true;
       this.health = 100;
-      this.gameServer.broadcast("h", this.id, this.health);
+      this.gameServer.broadcast('h', this.id, this.health);
       this.sendRespawnInfo();
     }, 4000);
   }
@@ -220,7 +220,7 @@ class Player {
     this.rotation.b = Utils.decodeFloat(data[5]);
     if (this.position != cachePosition || this.rotation != cacheRotation) {
       this.gameServer.broadcast(
-        "p",
+        'p',
         this.id,
         Utils.encodeFloat(this.position.x),
         Utils.encodeFloat(this.position.y),
@@ -234,12 +234,12 @@ class Player {
   handleStateUpdate(data) {
     try {
       this.states[data[1]] = data[2];
-      this.gameServer.broadcastExcept(this.id, "s", this.id, data[1], data[2]);
+      this.gameServer.broadcastExcept(this.id, 's', this.id, data[1], data[2]);
     } catch (_) {}
   }
 
   handleEventUpdate(data) {
-    this.gameServer.broadcastExcept(this.id, "e", this.id, data[1]);
+    this.gameServer.broadcastExcept(this.id, 'e', this.id, data[1]);
   }
 
   handleDamageUpdate(data) {
@@ -253,7 +253,7 @@ class Player {
   handleThrowUpdate(data) {
     this.gameServer.broadcastExcept(
       this.id,
-      "throw",
+      'throw',
       data[1],
       data[2],
       data[3],
@@ -268,21 +268,21 @@ class Player {
 
   handleWeaponUpdate(data) {
     this.weapon = data[1];
-    this.gameServer.broadcastExcept(this.id, "weapon", this.id, this.weapon);
+    this.gameServer.broadcastExcept(this.id, 'weapon', this.id, this.weapon);
   }
 
   handleChatMessage(data) {
-    this.gameServer.broadcast("chat", this.id, data[1]);
+    this.gameServer.broadcast('chat', this.id, data[1]);
   }
 
   handlePingMessage(data) {
-    this.sendData("ping", true);
+    this.sendData('ping', true);
   }
 
   sendRespawnInfo() {
     if (Date.now() >= this.lastRespawnTime + 5000) {
       const spawn = this.gameServer.getSpawnPoint();
-      this.gameServer.broadcast("respawn", this.id, {
+      this.gameServer.broadcast('respawn', this.id, {
         position: {
           x: spawn.position.x,
           y: spawn.position.y,
@@ -304,39 +304,39 @@ class Player {
 
   // 'Me' means the details of the player's self
   sendMe() {
-    this.sendData("me", {
-      dance: "Techno",
+    this.sendData('me', {
+      dance: 'Techno',
       group: this.id,
       heroSkin: false,
       playerId: this.id,
       skin: this.character,
-      team: "none",
+      team: 'none',
       username: this.playerName,
       weapon: this.weapon,
       weaponSkins: {
         Scar: false,
         Shotgun: false,
         Sniper: false,
-        "Tec-9": false,
+        'Tec-9': false,
       },
     });
   }
 
   sendMode() {
-    this.sendData("mode", this.gameServer.gameMode, this.gameServer.map, false);
+    this.sendData('mode', this.gameServer.gameMode, this.gameServer.map, false);
   }
 
   sendPlayerInfo(id) {
     for (var i = 0; i < this.gameServer.players.length; i++) {
       if (this.gameServer.players[i].id == id) {
         const player = this.gameServer.players[i];
-        this.sendData("player", {
-          dance: "Techno",
+        this.sendData('player', {
+          dance: 'Techno',
           group: player.id,
           heroSkin: false,
           playerId: player.id,
           skin: player.character,
-          team: "none",
+          team: 'none',
           username: player.playerName,
           weapon: player.weapon,
         });
@@ -346,13 +346,13 @@ class Player {
 
   sendLobbyPlayersInfo() {
     // Not sure why but in game, there is player with ID -1
-    this.sendData("player", {
+    this.sendData('player', {
       dance: false,
       group: -1,
-      skin: "none",
-      playerId: "-1",
+      skin: 'none',
+      playerId: '-1',
       team: -1,
-      username: "",
+      username: '',
       weapon: false,
     });
     for (var i = 0; i < this.gameServer.players.length; i++) {
@@ -373,8 +373,8 @@ class GameServer {
     this.roomID = roomID;
     this.players = [];
 
-    this.map = "Sierra";
-    this.gameMode = "FFA";
+    this.map = 'Sierra';
+    this.gameMode = 'FFA';
 
     this.lastAssignedID = 0;
 
@@ -390,7 +390,7 @@ class GameServer {
 
     this.timerInterval = null;
 
-    this.wss.on("connection", (ws) => {
+    this.wss.on('connection', (ws) => {
       this.addPlayer(ws);
     });
 
@@ -437,7 +437,7 @@ class GameServer {
     this.lastAssignedID += 1;
     const newPlayer = new Player(this.lastAssignedID, ws, this);
     this.players.push(newPlayer);
-    newPlayer.sendData("auth", true);
+    newPlayer.sendData('auth', true);
     if (!this.timerInterval) {
       // Set timer when first player joins
       this.timerInterval = setInterval(() => {
@@ -446,7 +446,7 @@ class GameServer {
         if (this.timer == 0) {
           this.endGame();
         }
-        this.broadcast("t", this.timer);
+        this.broadcast('t', this.timer);
       }, 1000);
     }
   }
@@ -454,7 +454,7 @@ class GameServer {
   removePlayer(id) {
     for (var i = 0; i < this.players.length; i++) {
       if (this.players[i].id == id) {
-        this.broadcastExcept(id, "left", this.players[i].id);
+        this.broadcastExcept(id, 'left', this.players[i].id);
         this.players.splice(i, 1);
         this.broadcastBoard();
       }
@@ -483,7 +483,7 @@ class GameServer {
       resultBoard.push({
         id: this.players[i].id,
         username: this.players[i].playerName,
-        team: "none",
+        team: 'none',
         won: 0,
         kill: this.players[i].kills,
         death: this.players[i].deaths,
@@ -513,7 +513,7 @@ class GameServer {
       }
     });
     resultBoard[0].won = 1;
-    this.broadcast("finish", resultBoard);
+    this.broadcast('finish', resultBoard);
     setTimeout(() => {
       // Restart game
       this.restartGame();
@@ -587,7 +587,7 @@ class GameServer {
   }
 
   broadcastBoard() {
-    this.broadcast("board", this.constructBoard());
+    this.broadcast('board', this.constructBoard());
   }
 }
 

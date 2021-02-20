@@ -1,16 +1,16 @@
-require("dotenv").config();
+require('dotenv').config();
 
-const http = require("http");
-const express = require("express");
-const bodyParser = require("body-parser");
+const http = require('http');
+const express = require('express');
+const bodyParser = require('body-parser');
 
-const { GameServer } = require("./game-server");
-const serverLinkRouter = require("./router");
+const { GameServer } = require('./game-server');
+const serverLinkRouter = require('./router');
 
 const app = express();
 
 app.use(bodyParser.json());
-app.use("/", serverLinkRouter);
+app.use('/', serverLinkRouter);
 
 const server = http.createServer(app);
 
@@ -18,7 +18,7 @@ const gameServers = {};
 
 function createGameServer(id, map) {
   if (id in gameServers)
-    throw new Error("Game server with that ID already exists");
+    throw new Error('Game server with that ID already exists');
   const newGameServer = new GameServer(id);
   newGameServer.map = map;
   gameServers[id] = newGameServer;
@@ -38,9 +38,9 @@ function destroyGameServer(id) {
   }
 }
 
-server.on("upgrade", function upgrade(request, socket, head) {
+server.on('upgrade', function upgrade(request, socket, head) {
   const pathname = request.url,
-    roomID = pathname.split("?").pop();
+    roomID = pathname.split('?').pop();
 
   if (roomID in gameServers) {
     gameServers[roomID].wss.handleUpgrade(
@@ -48,7 +48,7 @@ server.on("upgrade", function upgrade(request, socket, head) {
       socket,
       head,
       function done(ws) {
-        gameServers[roomID].wss.emit("connection", ws, request);
+        gameServers[roomID].wss.emit('connection', ws, request);
       }
     );
     return;
