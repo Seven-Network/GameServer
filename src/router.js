@@ -1,24 +1,24 @@
-const router = require("express").Router();
+const router = require('express').Router();
 
-router.get("/", (_, res) => {
-  res.send("Welcome to the Seven Network game server ✨");
+router.get('/', (_, res) => {
+  res.send('Welcome to the Seven Network game server ✨');
 });
 
-router.get("/get-game/:id/:serverLinkPass", (req, res) => {
+router.get('/get-game/:id/:serverLinkPass', (req, res) => {
   if (req.params.serverLinkPass != process.env.SERVER_LINK_PASS) {
     res.status(403);
-    res.send("Incorrect server link password");
+    res.send('Incorrect server link password');
   } else {
     try {
       if (global.gameServers[req.params.id]) {
         const gameServer = global.gameServers[req.params.id];
         res.json({
           map: gameServer.map,
-          mode: gameServer.mode
+          mode: gameServer.mode,
         });
       } else {
         res.status(400);
-        res.send("Game does not exist");
+        res.send('Game does not exist');
       }
     } catch (error) {
       res.status(500);
@@ -27,14 +27,14 @@ router.get("/get-game/:id/:serverLinkPass", (req, res) => {
   }
 });
 
-router.get("/create-game/:id/:map/:serverLinkPass", (req, res) => {
+router.get('/create-game/:id/:map/:serverLinkPass', (req, res) => {
   if (req.params.serverLinkPass != process.env.SERVER_LINK_PASS) {
     res.status(403);
-    res.send("Incorrect server link password");
+    res.send('Incorrect server link password');
   } else {
     try {
       global.createGameServer(req.params.id, req.params.map);
-      res.send("Created game server");
+      res.send('Created game server');
     } catch (error) {
       res.status(500);
       res.send(error.message);
