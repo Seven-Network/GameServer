@@ -8,12 +8,21 @@ const matchLength = 300;
 const mapList = ['Sierra', 'Xibalba', 'Mistle', 'Tundra', 'Temple'];
 const gatewayHost = process.env.GATEWAY_HOST;
 
+const lethalExplosionRange = 10;
+const maxExplosionRange = 60;
+
 const Utils = {
   encodeFloat: function (e) {
     return 5 * parseFloat(parseFloat(e).toFixed(1));
   },
   decodeFloat: function (e) {
     return e / 5;
+  },
+  getVectorDistance: function (a, b) {
+    const dx = a.x - b.x;
+    const dy = a.y - b.y;
+    const dz = a.z - b.z;
+    return Math.sqrt(dx * dx + dy * dy + dz * dz);
   },
 };
 
@@ -77,6 +86,7 @@ class Player {
       e: 'handleEventUpdate',
       da: 'handleDamageUpdate',
       throw: 'handleThrowUpdate',
+      radius: 'handleRadiusUpdate',
       weapon: 'handleWeaponUpdate',
       respawn: 'sendRespawnInfo',
       drown: 'handleDrownUpdate',
@@ -270,6 +280,31 @@ class Player {
       this.id,
       false
     );
+  }
+
+  handleRadiusUpdate(data) {
+    const explosionPosition = {
+      x: Utils.decodeFloat(data[2]),
+      y: Utils.decodeFloat(data[3]),
+      z: Utils.decodeFloat(data[4]),
+    };
+    for (var i = 0; i < this.gameServer.players.length; i++) {
+      const distanceToExplosion = Utils.getVectorDistance(
+        this.gameServer.players[i].position,
+        explosionPosition
+      );
+      if (distanceToExplosion <= maxExplosionRange) {
+        var damage = 0;
+        if (distanceToExplosion <= lethalExplosionRange) {
+          damage = 100;
+        } else {
+          const d = distanceToExplosion - lethalExplosionRange;
+          const m = maxExplosionRange - lethalExplosionRange;
+          damage = ((m - d) / m) * 100;
+        }
+        this.gameServer.players[i].takeDamage(damage, this.id, false);
+      }
+    }
   }
 
   handleWeaponUpdate(data) {
