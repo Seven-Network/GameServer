@@ -103,6 +103,10 @@ class Player {
   }
 
   authenticate(data) {
+    if (this.gameServer.players.length >= 6) {
+      this.sendData('kick', 'Game is full');
+      this.ws.close(1000);
+    }
     this.hash = data[6];
     axios
       .post(`http://${gatewayHost}/user/details?hash=${this.hash}`)
