@@ -15,6 +15,11 @@ const Utils = {
   decodeFloat: function (e) {
     return e / 5;
   },
+  getVectorDistance: function (a, b) {
+    const xDiff = a.x - b.x;
+    const yDiff = a.y - b.y;
+    return Math.sqrt(xDiff * xDiff + yDiff * yDiff);
+  },
 };
 
 class Player {
