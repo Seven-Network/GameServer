@@ -113,7 +113,7 @@ class Player {
   }
 
   authenticate(data) {
-    if (this.gameServer.players.length >= 6) {
+    if (this.gameServer.players.length > 6) {
       this.sendData('kick', 'Game is full');
       this.ws.close(1000);
     }
