@@ -21,6 +21,7 @@ router.get('/get-game/:id/:serverLinkPass', (req, res) => {
         res.send('Game does not exist');
       }
     } catch (error) {
+      console.error(error);
       res.status(500);
       res.send(error.message);
     }
@@ -36,6 +37,7 @@ router.get('/create-game/:id/:map/:serverLinkPass', (req, res) => {
       global.createGameServer(req.params.id, req.params.map);
       res.send('Created game server');
     } catch (error) {
+      console.error(error);
       res.status(500);
       res.send(error.message);
     }
