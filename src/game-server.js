@@ -32,6 +32,7 @@ class Player {
     this.ws = ws;
     this.gameServer = gameServer;
 
+    this.hash = null;
     this.playerName = '';
     this.character = '';
     this.weapon = '';
@@ -538,6 +539,16 @@ class GameServer {
         experience: 0,
         coins: 0,
       });
+      axios.post(
+        `http://${gatewayHost}/user/update-stats/${process.env.SERVER_LINK_PASS}`,
+        {
+          hahs: this.players[i].hash,
+          obtainedKills: this.players[i].kills,
+          obtainedDeaths: this.players[i].deaths,
+          obtainedHeadshots: this.players[i].headshots,
+          obtainedExp: this.players[i].score,
+        }
+      );
     }
     if (resultBoard.length < 1) {
       this.shouldTick = false;
