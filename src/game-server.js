@@ -542,7 +542,7 @@ class GameServer {
       axios.post(
         `http://${gatewayHost}/user/update-stats/${process.env.SERVER_LINK_PASS}`,
         {
-          hahs: this.players[i].hash,
+          hash: this.players[i].hash,
           obtainedKills: this.players[i].kills,
           obtainedDeaths: this.players[i].deaths,
           obtainedHeadshots: this.players[i].headshots,
