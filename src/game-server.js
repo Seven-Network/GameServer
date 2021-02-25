@@ -9,7 +9,7 @@ const mapList = ['Sierra', 'Xibalba', 'Mistle', 'Tundra', 'Temple'];
 const gatewayHost = process.env.GATEWAY_HOST;
 
 const lethalExplosionRange = 10;
-const maxExplosionRange = 60;
+const maxExplosionRange = 20;
 
 const Utils = {
   encodeFloat: function (e) {
@@ -335,12 +335,17 @@ class Player {
           z: spawn.rotation.z,
         },
       });
-      this.lastRespawnTime = Date.now();
     }
   }
 
-  handleDrownUpdate() {
-    this.die(this.id, 100, false);
+  handleDrownUpdate(data) {
+    this.gameServer.broadcast("announce", 'kill', this.id, -10, "Suicide")
+    this.gameServer.broadcast("k", this.id, this.id, "Drown");
+    this.gameServer.broadcast("notification", "kill", {killer: this.id, killed: this.id, reason: "Drown"})
+    setTimeout(() => {
+      this.sendRespawnInfo();
+      this.sendData("h", this.id, 100)
+    }, 4000)
   }
 
   // 'Me' means the details of the player's self
