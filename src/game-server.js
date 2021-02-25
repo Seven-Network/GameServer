@@ -339,13 +339,17 @@ class Player {
   }
 
   handleDrownUpdate(data) {
-    this.gameServer.broadcast("announce", 'kill', this.id, -10, "Suicide")
-    this.gameServer.broadcast("k", this.id, this.id, "Drown");
-    this.gameServer.broadcast("notification", "kill", {killer: this.id, killed: this.id, reason: "Drown"})
+    this.gameServer.broadcast('announce', 'kill', this.id, -10, 'Suicide');
+    this.gameServer.broadcast('k', this.id, this.id, 'Drown');
+    this.gameServer.broadcast('notification', 'kill', {
+      killer: this.id,
+      killed: this.id,
+      reason: 'Drown',
+    });
     setTimeout(() => {
       this.sendRespawnInfo();
-      this.sendData("h", this.id, 100)
-    }, 4000)
+      this.sendData('h', this.id, 100);
+    }, 4000);
   }
 
   // 'Me' means the details of the player's self
