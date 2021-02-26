@@ -9,7 +9,7 @@ const mapList = ['Sierra', 'Xibalba', 'Mistle', 'Tundra', 'Temple'];
 const gatewayHost = process.env.GATEWAY_HOST;
 
 const lethalExplosionRange = 10;
-const maxExplosionRange = 60;
+const maxExplosionRange = 20;
 
 const Utils = {
   encodeFloat: function (e) {
@@ -174,7 +174,12 @@ class Player {
 
   die(killerID, damage, headshot) {
     this.gameServer.broadcast('d', this.id);
-    this.gameServer.broadcast('k', this.id, killerID);
+    this.gameServer.broadcast(
+      'k',
+      this.id,
+      killerID,
+      killerID == this.id ? 'Drown' : false
+    );
 
     var score;
     var notif;
@@ -190,7 +195,7 @@ class Player {
     this.gameServer.broadcast('notification', 'kill', {
       killer: killerID,
       killed: this.id,
-      reason: killerID == this.id ? 'Suicide' : false,
+      reason: killerID == this.id ? 'Drown' : false,
     });
     this.gameServer.broadcast('announce', 'kill', killerID, score, notif);
 
@@ -336,11 +341,10 @@ class Player {
           z: spawn.rotation.z,
         },
       });
-      this.lastRespawnTime = Date.now();
     }
   }
 
-  handleDrownUpdate() {
+  handleDrownUpdate(_) {
     this.die(this.id, 100, false);
   }
 
