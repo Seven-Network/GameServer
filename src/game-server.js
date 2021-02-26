@@ -173,7 +173,12 @@ class Player {
 
   die(killerID, damage, headshot) {
     this.gameServer.broadcast('d', this.id);
-    this.gameServer.broadcast('k', this.id, killerID);
+    this.gameServer.broadcast(
+      'k',
+      this.id,
+      killerID,
+      killerID == this.id ? 'Drown' : false
+    );
 
     var score;
     var notif;
@@ -189,7 +194,7 @@ class Player {
     this.gameServer.broadcast('notification', 'kill', {
       killer: killerID,
       killed: this.id,
-      reason: killerID == this.id ? 'Suicide' : false,
+      reason: killerID == this.id ? 'Drown' : false,
     });
     this.gameServer.broadcast('announce', 'kill', killerID, score, notif);
 
@@ -338,18 +343,8 @@ class Player {
     }
   }
 
-  handleDrownUpdate(data) {
-    this.gameServer.broadcast('announce', 'kill', this.id, -10, 'Suicide');
-    this.gameServer.broadcast('k', this.id, this.id, 'Drown');
-    this.gameServer.broadcast('notification', 'kill', {
-      killer: this.id,
-      killed: this.id,
-      reason: 'Drown',
-    });
-    setTimeout(() => {
-      this.sendRespawnInfo();
-      this.sendData('h', this.id, 100);
-    }, 4000);
+  handleDrownUpdate(_) {
+    this.die(this.id, 100, false);
   }
 
   // 'Me' means the details of the player's self
