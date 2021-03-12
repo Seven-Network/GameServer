@@ -1,6 +1,6 @@
 {
   "name": "seven-game-server",
-  "version": "0.1.11",
+  "version": "0.1.3",
   "description": "Node WS game server for Seven Network",
   "main": "./src/server.js",
   "scripts": {
